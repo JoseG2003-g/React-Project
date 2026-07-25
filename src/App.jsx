@@ -1,38 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
 
-const Card = ({title}) =>{
+import Search from './components/Search'
+import React, { useState, useEffect } from 'react'
 
-  const[hasLiked, setHasLiked] = useState(false);
+
+const API_BASED_URL= 'https://api.themoviedb.org/3';
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+
+const API_OPTIONS = {
+  method: 'GET',
+  headers:{
+    accept: 'application/json',
+    Authorization: `Bearer ${API_KEY}`
+  }
+}
+
+
+const App = () => {
+  const[searchTerm, setSearchTerm] = useState('');
+
+  const[errorMessage, setErrorMessage] = useState('');
+
+  const fetchMovies = async () => {
+    try{
+
+    }catch (error){
+      console.error(`Error fetching movies ${error}`);
+      setErrorMessage('Error fetching movies, please try again later');
+    }
+  }
+
+  useEffect (() =>{
+
+  }, []);
+
   return (
-    <div className="card">
-      <h2> {title} </h2>
-      <button onClick = {() => setHasLiked(true)}> 
-        {hasLiked ? 'Liked' : 'Like'}
+    <main>
 
-      </button>
-    </div>
+        <div className= "pattern"/>
+        <div className= "wrapper">
+            <header>
+              <img src = "./hero.png" alt="Hero Banner" />
+                <h1>Find <span className="text-gradient">Movies</span> you'll enjoy without the hassle</h1>
+            </header>
+
+           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+           <h1 className= "text-white" >{searchTerm}</h1>
+
+        </div>
+
+
+    </main>
   )
 }
 
-const App = () =>{
-
-  
-
-  return (
-    <div className= "card-container">
-      
-      <Card title = "Star Wars" rating ={6} isCool ={true} actors= {[{name: 'Actors'}]}/>
-      <Card title = "Avatar"/>
-      <Card title = "The Lion King"/>
-      
-
-    </div>
-  )
-}
 
 
 export default App
