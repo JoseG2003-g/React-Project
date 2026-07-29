@@ -1,6 +1,8 @@
 
 import Search from './components/Search'
 import React, { useState, useEffect } from 'react'
+import Spinner from './components/Spinner'
+import MovieCard from './components/MovieCard';
 
 
 const API_BASED_URL= 'https://api.themoviedb.org/3';
@@ -20,17 +22,41 @@ const App = () => {
 
   const[errorMessage, setErrorMessage] = useState('');
 
+  const[movieList, setMovieList] = useState([]);
+  const[isLoading, setIsLoading] = useState(false);
+
+
   const fetchMovies = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+
     try{
+      const endpoint = `${API_BASED_URL}/discover/movie?sort_by=popularity.desc`;
+      const response = await fetch(endpoint, API_OPTIONS);
+      if(!response.ok){
+        throw new Error('Failed to fetch movies');
+
+      }
+      
+      const data = await response.json();
+
+      if(data.Response == 'False'){
+        setErrorMessage(data.Error || 'Failed to fetch movies');
+        setMovieList([]);
+        return;
+      }
+      setMovieList(data.results || []);
 
     }catch (error){
       console.error(`Error fetching movies ${error}`);
       setErrorMessage('Error fetching movies, please try again later');
+    } finally{
+      setIsLoading(false);
     }
   }
 
   useEffect (() =>{
-
+    fetchMovies();
   }, []);
 
   return (
@@ -41,10 +67,35 @@ const App = () => {
             <header>
               <img src = "./hero.png" alt="Hero Banner" />
                 <h1>Find <span className="text-gradient">Movies</span> you'll enjoy without the hassle</h1>
+
+                <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
+
             </header>
 
-           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-           <h1 className= "text-white" >{searchTerm}</h1>
+            <section className = "all-movies"> 
+              <h2 className = "mt-[40px]">All Movies</h2>
+
+              {isLoading ? (
+                <Spinner/>
+              ) : errorMessage ? (
+                <p className = "text-red-500"> {errorMessage}</p>
+              ) : (
+                <ul>
+                  {movieList.map((movie) => (
+                    <MovieCard key = {movie.id} movie={movie}/>
+                  ))
+
+                  }
+                </ul>
+              )
+              
+            
+              
+              }
+
+              {errorMessage && <p className="text-red-500"> {errorMessage} </p>}
+
+            </section>
 
         </div>
 
