@@ -7,15 +7,15 @@ const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
 
 const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint('https://nyc.cloud.appwrite.io/v1')
     .setProject(PROJECT_ID)
 
-const databse = new Databases(client);
+const database = new Databases(client);
 
 export const updateSearchCount = async (searchTerm, movie) => {
     //Use appwriet to check if term exists
     try{
-        const result = await databse.listDocuments(DATABASE_ID, COLLECTION_ID, [Query.equal('searchTerm', searchTerm),])
+        const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [Query.equal('searchTerm', searchTerm),])
         if(result.documents.length > 0){
             const doc = result.documents[0];
 
@@ -34,6 +34,21 @@ export const updateSearchCount = async (searchTerm, movie) => {
         }
     }catch(error){
 
+    }
+}
+
+export const getTrendingMovies = async () => {
+    try{
+        const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
+            Query.limit(5),
+            Query.orderDesc("count"),
+
+        ])
+
+        return result.documents;
+
+    }catch(error){
+        console.error(error);
     }
 }
 
